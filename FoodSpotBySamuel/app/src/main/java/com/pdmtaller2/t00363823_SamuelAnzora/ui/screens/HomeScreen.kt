@@ -11,7 +11,11 @@ import com.pdmtaller2.t00363823_SamuelAnzora.ui.components.BottomNavBar
 
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    onRestaurantClick: (String) -> Unit, // NUEVO
+    onNavigate: (String) -> Unit,        // para BottomNavBar, si luego agregas más
+    modifier: Modifier = Modifier
+) {
     val restaurantsByCategory = allRestaurants.groupBy { it.category }
 
     Column(
@@ -26,16 +30,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         )
 
         restaurantsByCategory.forEach { (category, restaurants) ->
-            Text(
-                text = category,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Text(text = category, style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            RestaurantRow(restaurants)
+            RestaurantRow(restaurants = restaurants, onItemClick = onRestaurantClick) // CAMBIO
             Spacer(modifier = Modifier.height(16.dp))
         }
 
         Spacer(modifier = Modifier.weight(1f))
-        BottomNavBar(selected = "Listado")
+        BottomNavBar(selected = "Listado", onNavigate = onNavigate) // CAMBIO
     }
 }

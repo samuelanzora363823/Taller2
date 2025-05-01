@@ -1,5 +1,6 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -24,18 +25,22 @@ import coil.request.ImageRequest
 import com.pdmtaller2.t00363823_SamuelAnzora.model.RestaurantItem
 
 @Composable
-fun RestaurantRow(restaurants: List<RestaurantItem>) {
+fun RestaurantRow(
+    restaurants: List<RestaurantItem>,
+    onItemClick: (String) -> Unit // NUEVO
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp), // Altura fija para evitar scroll vertical
+            .height(160.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         restaurants.forEach { restaurant ->
             ElevatedCard(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .clickable { onItemClick(restaurant.name) }, // NUEVO
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -43,8 +48,6 @@ fun RestaurantRow(restaurants: List<RestaurantItem>) {
                         ImageRequest.Builder(LocalContext.current)
                             .data(restaurant.imageRes)
                             .crossfade(true)
-                            .error(android.R.drawable.ic_menu_report_image)
-                            .placeholder(android.R.drawable.ic_menu_gallery)
                             .build()
                     )
 

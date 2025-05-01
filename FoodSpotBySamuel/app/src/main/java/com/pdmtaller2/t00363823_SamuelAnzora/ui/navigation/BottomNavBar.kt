@@ -1,6 +1,7 @@
 package com.pdmtaller2.t00363823_SamuelAnzora.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 @Composable
 fun BottomNavBar(
     selected: String,
+    onNavigate: (String) -> Unit, // NUEVO
     modifier: Modifier = Modifier,
     items: List<String> = listOf("Listado", "Busqueda", "Mis ordenes")
 ) {
@@ -35,7 +37,8 @@ fun BottomNavBar(
                 text = item,
                 modifier = Modifier
                     .background(color = backgroundColor, shape = RoundedCornerShape(16.dp))
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .clickable { onNavigate(item.lowercase()) }, // convierte en ruta: listado, busqueda, etc.
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = textColor,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal

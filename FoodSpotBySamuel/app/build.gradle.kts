@@ -54,6 +54,8 @@ dependencies {
     // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
 
+    implementation ("androidx.navigation:navigation-compose:2.7.5")
+
     // Material 3
     implementation(libs.androidx.material3)
 
