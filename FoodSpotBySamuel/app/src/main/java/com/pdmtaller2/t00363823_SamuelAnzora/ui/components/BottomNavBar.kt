@@ -10,30 +10,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
-fun BottomNavBar(selected: String) {
+fun BottomNavBar(
+    selected: String,
+    modifier: Modifier = Modifier,
+    items: List<String> = listOf("Listado", "Busqueda", "Mis ordenes")
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
-            .background(Color.LightGray, shape = RoundedCornerShape(24.dp)),
+            .background(color = Color.LightGray, shape = RoundedCornerShape(24.dp))
+            .padding(vertical = 12.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        listOf("Listado", "Busqueda", "Mis ordenes").forEach { item ->
+        items.forEach { item ->
             val isSelected = item == selected
+            val backgroundColor = if (isSelected) Color(0xFFA8E6CF) else Color.Transparent
+            val textColor = if (isSelected) Color.Black else Color.Gray
+
             Text(
                 text = item,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .background(
-                        color = if (isSelected) Color(0xFFA8E6CF) else Color.Transparent,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .background(color = backgroundColor, shape = RoundedCornerShape(16.dp))
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = if (isSelected) Color.Black else Color.Gray
+                    color = textColor,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                 )
             )
         }
