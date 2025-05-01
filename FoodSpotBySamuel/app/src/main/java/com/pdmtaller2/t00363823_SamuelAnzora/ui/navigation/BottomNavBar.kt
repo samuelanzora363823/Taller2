@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 @Composable
 fun BottomNavBar(
     selected: String,
-    onNavigate: (String) -> Unit, // NUEVO
+    onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier,
     items: List<String> = listOf("Listado", "Busqueda", "Mis ordenes")
 ) {
@@ -38,7 +38,7 @@ fun BottomNavBar(
                 modifier = Modifier
                     .background(color = backgroundColor, shape = RoundedCornerShape(16.dp))
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clickable { onNavigate(item.lowercase()) }, // convierte en ruta: listado, busqueda, etc.
+                    .clickable { onNavigate(item.lowercase()) },
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = textColor,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal

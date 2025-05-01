@@ -5,15 +5,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pdmtaller2.t00363823_SamuelAnzora.data.allRestaurants
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.components.BottomNavBar
 
 
+
 @Composable
 fun HomeScreen(
-    onRestaurantClick: (String) -> Unit, // NUEVO
-    onNavigate: (String) -> Unit,        // para BottomNavBar, si luego agregas más
+    onRestaurantClick: (String) -> Unit,
+    onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val restaurantsByCategory = allRestaurants.groupBy { it.category }
@@ -32,11 +34,18 @@ fun HomeScreen(
         restaurantsByCategory.forEach { (category, restaurants) ->
             Text(text = category, style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            RestaurantRow(restaurants = restaurants, onItemClick = onRestaurantClick) // CAMBIO
+            RestaurantRow(restaurants = restaurants, onItemClick = onRestaurantClick)
             Spacer(modifier = Modifier.height(16.dp))
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-        BottomNavBar(selected = "Listado", onNavigate = onNavigate) // CAMBIO
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    HomeScreen(
+        onRestaurantClick = {},
+        onNavigate = {},
+        modifier = Modifier.fillMaxSize()
+    )
 }
