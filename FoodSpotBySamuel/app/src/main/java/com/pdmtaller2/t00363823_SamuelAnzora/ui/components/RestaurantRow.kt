@@ -1,21 +1,16 @@
+package com.pdmtaller2.t00363823_SamuelAnzora.ui.components
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,13 +38,16 @@ fun RestaurantRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         restaurants.forEach { restaurant ->
-            RestaurantCard(
-                restaurant = restaurant,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                onClick = { onItemClick(restaurant.name) }
-            )
+            // Utilizamos key para evitar recomposición innecesaria
+            key(restaurant.name) {
+                RestaurantCard(
+                    restaurant = restaurant,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    onClick = { onItemClick(restaurant.name) }
+                )
+            }
         }
     }
 }
@@ -63,46 +61,48 @@ fun RestaurantCard(
     Card(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() },
+            .clickable(onClick = onClick), // Usamos clickable en lugar del onClick de Card
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Box(contentAlignment = Alignment.BottomStart) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                val painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(restaurant.imageRes)
-                        .crossfade(true)
-                        .build()
-                )
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Optimización en la carga de imágenes con rememberAsyncImagePainter
+            val painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(restaurant.imageRes)
+                    .crossfade(true) // Habilitar crossfade para transiciones suaves
+                    .build()
+            )
 
-                Image(
-                    painter = painter,
-                    contentDescription = "Restaurante ${restaurant.name}",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+            Image(
+                painter = painter,
+                contentDescription = "Imagen de ${restaurant.name}",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .align(Alignment.BottomStart)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.7f)
-                                ),
-                                startY = 0f,
-                                endY = 100f
-                            )
+            // Fondo degradado sobre la imagen para mejorar la legibilidad del texto
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .align(Alignment.BottomStart)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.7f)
+                            ),
+                            startY = 0f,
+                            endY = 100f
                         )
-                )
-            }
+                    )
+            )
 
+            // Información del restaurante sobre la imagen
             Column(
                 modifier = Modifier
+                    .align(Alignment.BottomStart)
                     .padding(12.dp)
             ) {
                 Text(

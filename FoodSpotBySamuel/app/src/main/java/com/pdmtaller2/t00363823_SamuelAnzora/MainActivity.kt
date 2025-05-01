@@ -41,24 +41,26 @@ fun FoodSpotApp() {
     var showBottomBar by remember { mutableStateOf(true) }
     val cartItemCount by remember { derivedStateOf { CartManager.getTotalItems() } }
 
-    // Observar cambios en la navegación
+    // Optimizar la observación de cambios en la navegación
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     LaunchedEffect(navBackStackEntry) {
-        when (navBackStackEntry?.destination?.route) {
-            "listado" -> {
-                selectedItem = "Listado"
-                showBottomBar = true
+        navBackStackEntry?.destination?.route?.let {
+            when (it) {
+                "listado" -> {
+                    selectedItem = "Listado"
+                    showBottomBar = true
+                }
+                "busqueda" -> {
+                    selectedItem = "Busqueda"
+                    showBottomBar = true
+                }
+                "carrito" -> {
+                    selectedItem = "Carrito"
+                    showBottomBar = true
+                }
+                else -> showBottomBar = false
             }
-            "busqueda" -> {
-                selectedItem = "Busqueda"
-                showBottomBar = true
-            }
-            "carrito" -> {
-                selectedItem = "Carrito"
-                showBottomBar = true
-            }
-            else -> showBottomBar = false
         }
     }
 
@@ -69,6 +71,7 @@ fun FoodSpotApp() {
                     selected = selectedItem,
                     onNavigate = { route ->
                         navController.navigate(route) {
+                            // Optimización de la navegación: Restablecer el estado de la pila solo cuando sea necesario
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
@@ -87,6 +90,7 @@ fun FoodSpotApp() {
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
