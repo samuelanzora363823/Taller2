@@ -8,13 +8,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pdmtaller2.t00363823_SamuelAnzora.data.getMenuForRestaurant
@@ -37,6 +43,25 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+                actions = {
+                    // Botón para ir al carrito
+                    IconButton(onClick = { navController.navigate("carrito") }) {
+                        BadgedBox(
+                            badge = {
+                                if (CartManager.getTotalItems() > 0) {
+                                    Badge {
+                                        Text(CartManager.getTotalItems().toString())
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ShoppingCart,
+                                contentDescription = "Carrito"
+                            )
+                        }
                     }
                 }
             )
@@ -61,9 +86,17 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filtered) { dish ->
-                    DishCard(dish = dish) {
-                        Toast.makeText(context, "${dish.name} agregado al carrito", Toast.LENGTH_SHORT).show()
-                    }
+                    DishCard(
+                        dish = dish,
+                        onAdd = {
+                            CartManager.addToCart(dish)
+                            Toast.makeText(
+                                context,
+                                "${dish.name} agregado al carrito",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
                 }
             }
         }
@@ -72,25 +105,75 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
 
 @Composable
 fun DishCard(dish: DishItem, onAdd: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    var isAdded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
         Row(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = dish.imageRes),
                 contentDescription = dish.name,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.width(12.dp))
+
+            Spacer(modifier = Modifier.width(16.dp))
+
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = dish.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = dish.description, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = dish.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = dish.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                dish.price?.let {
+                    Text(
+                        text = "$${"%.2f".format(it)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
-            Button(onClick = onAdd) {
-                Text("Agregar")
+
+            Button(
+                onClick = {
+                    onAdd()
+                    isAdded = true
+                },
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isAdded) MaterialTheme.colorScheme.tertiary
+                    else MaterialTheme.colorScheme.primary
+                )
+            ) {
+                if (isAdded) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Agregado",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("✓")
+                } else {
+                    Text("Agregar")
+                }
             }
         }
     }
