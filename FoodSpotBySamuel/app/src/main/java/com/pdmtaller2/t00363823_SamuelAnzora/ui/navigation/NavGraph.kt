@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.HomeScreen
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.RestaurantMenuScreen
-
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
@@ -23,7 +22,8 @@ fun AppNavGraph(
             onSelectedItemChange("Listado")
             HomeScreen(
                 onRestaurantClick = { restaurantName ->
-                    onSelectedItemChange("Busqueda")
+                    // Elimina esta línea para no cambiar el ítem seleccionado
+                    // onSelectedItemChange("Busqueda")
                     navController.navigate("menu/$restaurantName")
                 },
                 onNavigate = { route ->
@@ -37,7 +37,8 @@ fun AppNavGraph(
         }
 
         composable("menu/{restaurantName}") { backStackEntry ->
-            onSelectedItemChange("Busqueda")
+            // Elimina esta línea para no cambiar el ítem seleccionado
+            // onSelectedItemChange("Busqueda")
             val name = backStackEntry.arguments?.getString("restaurantName") ?: ""
             RestaurantMenuScreen(navController = navController, restaurantName = name)
         }
