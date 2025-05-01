@@ -5,5 +5,6 @@ import androidx.annotation.DrawableRes
 data class DishItem(
     val name: String,
     val description: String,
-    @DrawableRes val imageRes: Int
+    @DrawableRes val imageRes: Int,
+    val price: Double? = null
 )

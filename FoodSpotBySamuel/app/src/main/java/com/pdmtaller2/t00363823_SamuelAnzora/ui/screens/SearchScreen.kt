@@ -8,15 +8,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -174,48 +178,97 @@ fun RestaurantSearchItem(restaurant: RestaurantItem, navController: NavControlle
 @Composable
 fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: NavController) {
     val context = LocalContext.current
+    var isAdded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .clickable { /* Opcional: navegar a detalles del platillo */ },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = dish.imageRes),
                 contentDescription = dish.name,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop
             )
+
             Spacer(modifier = Modifier.width(16.dp))
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = dish.name,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
+
                 Text(
                     text = restaurant.name,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
                 Text(
                     text = dish.description,
                     style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                if (dish.price != null) {
+                    Text(
+                        text = "$${"%.2f".format(dish.price)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
+
             Button(
                 onClick = {
-                    Toast.makeText(context, "${dish.name} agregado al carrito", Toast.LENGTH_SHORT).show()
+                    CartManager.addToCart(dish)
+                    isAdded = true
+                    Toast.makeText(
+                        context,
+                        "${dish.name} agregado al carrito",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 },
-                modifier = Modifier.align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isAdded) MaterialTheme.colorScheme.tertiary
+                    else MaterialTheme.colorScheme.primary
+                )
             ) {
-                Text("Agregar")
+                if (isAdded) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Agregado",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("✓")
+                } else {
+                    Text("Agregar")
+                }
             }
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun SearchScreenPreview() {
