@@ -1,11 +1,11 @@
 package com.pdmtaller2.t00363823_SamuelAnzora.navigation
 
+import CartScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.CartScreen
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.HomeScreen
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.RestaurantMenuScreen
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.SearchScreen

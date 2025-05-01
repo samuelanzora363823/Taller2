@@ -41,7 +41,6 @@ android {
         compose = true
     }
 }
-
 dependencies {
     // Coil para imágenes
     implementation("io.coil-kt:coil-compose:2.4.0")
@@ -56,8 +55,11 @@ dependencies {
 
     implementation ("androidx.navigation:navigation-compose:2.7.5")
 
-    // Material 3
+    // Material 3 (Ya lo tienes, no lo borres)
     implementation(libs.androidx.material3)
+
+    // **Material 2 (Lo que agregamos para usar TopAppBar, IconButton, etc.)**
+    implementation("androidx.compose.material:material:1.4.0")  // Material 2
 
     // Compose UI (incluye básico + gráficos + tooling)
     implementation(libs.androidx.ui)

@@ -1,9 +1,15 @@
 package com.pdmtaller2.t00363823_SamuelAnzora.ui.screens
 
+
 import RestaurantRow
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,6 +26,9 @@ fun HomeScreen(
 ) {
     val restaurantsByCategory = allRestaurants.groupBy { it.category }
 
+    // Evita múltiples clics durante la navegación
+    var isClickEnabled by remember { mutableStateOf(true) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -34,11 +43,23 @@ fun HomeScreen(
         restaurantsByCategory.forEach { (category, restaurants) ->
             Text(text = category, style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            RestaurantRow(restaurants = restaurants, onItemClick = onRestaurantClick)
+
+            // Pasa una función segura al componente RestaurantRow
+            RestaurantRow(
+                restaurants = restaurants,
+                onItemClick = { restaurantName ->
+                    if (isClickEnabled) {
+                        isClickEnabled = false
+                        onRestaurantClick(restaurantName)
+                    }
+                }
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.CartManager
 
 @Composable
 fun BottomNavBar(

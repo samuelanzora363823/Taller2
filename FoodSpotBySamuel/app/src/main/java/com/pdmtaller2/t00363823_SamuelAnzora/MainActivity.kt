@@ -20,7 +20,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pdmtaller2.t00363823_SamuelAnzora.navigation.AppNavGraph
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.components.BottomNavBar
-import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.CartManager
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.theme.FoodSpotBySamuelTheme
 
 class MainActivity : ComponentActivity() {

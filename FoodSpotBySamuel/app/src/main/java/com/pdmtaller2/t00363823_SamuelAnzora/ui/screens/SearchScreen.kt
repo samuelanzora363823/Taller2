@@ -31,26 +31,35 @@ import com.pdmtaller2.t00363823_SamuelAnzora.data.getMenuForRestaurant
 import com.pdmtaller2.t00363823_SamuelAnzora.model.DishItem
 import com.pdmtaller2.t00363823_SamuelAnzora.model.RestaurantItem
 
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController) {
     val context = LocalContext.current
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
 
+    // Normalizamos la cadena de búsqueda eliminando todos los espacios y convirtiéndolo a minúsculas
+    val normalizedSearchQuery = searchQuery.text.replace(Regex("\\s+"), "").lowercase()
+
+    // Aquí creamos una lista con todos los platos de todos los restaurantes
     val allDishes = allRestaurants.flatMap { restaurant ->
         getMenuForRestaurant(restaurant.name).map { dish ->
             Pair(restaurant, dish)
         }
     }
 
+    // Filtramos los restaurantes y platos con la normalización aplicada
     val filteredRestaurants = allRestaurants.filter {
-        it.name.contains(searchQuery.text, ignoreCase = true) ||
-                it.category.contains(searchQuery.text, ignoreCase = true)
+        it.name.replace(Regex("\\s+"), "").lowercase().contains(normalizedSearchQuery) ||
+                it.category.replace(Regex("\\s+"), "").lowercase().contains(normalizedSearchQuery)
     }
 
     val filteredDishes = allDishes.filter {
-        it.second.name.contains(searchQuery.text, ignoreCase = true) ||
-                it.second.description.contains(searchQuery.text, ignoreCase = true)
+        it.second.name.replace(Regex("\\s+"), "").lowercase().contains(normalizedSearchQuery) ||
+                it.second.description?.replace(Regex("\\s+"), "")?.lowercase()?.contains(normalizedSearchQuery) == true
     }
 
     Scaffold(
@@ -82,7 +91,6 @@ fun SearchScreen(navController: NavController) {
                     focusedBorderColor = Color.Gray,
                     unfocusedBorderColor = Color.LightGray
                 )
-
             )
 
             if (searchQuery.text.isNotEmpty()) {
@@ -177,7 +185,6 @@ fun RestaurantSearchItem(restaurant: RestaurantItem, navController: NavControlle
 
 @Composable
 fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: NavController) {
-    val context = LocalContext.current
     var isAdded by remember { mutableStateOf(false) }
 
     Card(
@@ -189,7 +196,7 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
         Row(
             modifier = Modifier
                 .padding(16.dp)
-                .clickable { /* Opcional: navegar a detalles del platillo */ },
+                .clickable { /* Opcional: navegación a detalles */ },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -206,16 +213,13 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = dish.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.titleMedium
                 )
-
                 Text(
                     text = restaurant.name,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
                 Text(
                     text = dish.description,
                     style = MaterialTheme.typography.bodySmall,
@@ -223,12 +227,10 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 Spacer(modifier = Modifier.height(4.dp))
-
-                if (dish.price != null) {
+                dish.price?.let {
                     Text(
-                        text = "$${"%.2f".format(dish.price)}",
+                        text = "$${"%.2f".format(it)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
@@ -240,11 +242,6 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
                 onClick = {
                     CartManager.addToCart(dish)
                     isAdded = true
-                    Toast.makeText(
-                        context,
-                        "${dish.name} agregado al carrito",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 },
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -269,7 +266,7 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
         }
     }
 }
-@Preview(showBackground = true)
+
 @Composable
 fun SearchScreenPreview() {
     val navController = rememberNavController()

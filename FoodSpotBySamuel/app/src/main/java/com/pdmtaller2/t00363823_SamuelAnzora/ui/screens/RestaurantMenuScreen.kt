@@ -1,6 +1,5 @@
 package com.pdmtaller2.t00363823_SamuelAnzora.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,11 +11,11 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -29,7 +28,6 @@ import com.pdmtaller2.t00363823_SamuelAnzora.model.DishItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
-    val context = LocalContext.current
     var search by remember { mutableStateOf(TextFieldValue("")) }
     val dishes = getMenuForRestaurant(restaurantName)
     val filtered = dishes.filter {
@@ -46,7 +44,6 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
                     }
                 },
                 actions = {
-                    // Botón para ir al carrito
                     IconButton(onClick = { navController.navigate("carrito") }) {
                         BadgedBox(
                             badge = {
@@ -86,17 +83,7 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filtered) { dish ->
-                    DishCard(
-                        dish = dish,
-                        onAdd = {
-                            CartManager.addToCart(dish)
-                            Toast.makeText(
-                                context,
-                                "${dish.name} agregado al carrito",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
+                    DishCard(dish = dish)
                 }
             }
         }
@@ -104,7 +91,7 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
 }
 
 @Composable
-fun DishCard(dish: DishItem, onAdd: () -> Unit) {
+fun DishCard(dish: DishItem) {
     var isAdded by remember { mutableStateOf(false) }
 
     Card(
@@ -112,9 +99,7 @@ fun DishCard(dish: DishItem, onAdd: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -133,15 +118,16 @@ fun DishCard(dish: DishItem, onAdd: () -> Unit) {
                     text = dish.name,
                     style = MaterialTheme.typography.titleMedium
                 )
-                Text(
-                    text = dish.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-
+                dish.description?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 Spacer(modifier = Modifier.height(4.dp))
-
                 dish.price?.let {
                     Text(
                         text = "$${"%.2f".format(it)}",
@@ -154,21 +140,22 @@ fun DishCard(dish: DishItem, onAdd: () -> Unit) {
 
             Button(
                 onClick = {
-                    onAdd()
-                    isAdded = true
+                    if (!isAdded) {
+                        isAdded = true // cambia el estado inmediatamente
+                        CartManager.addToCart(dish)
+                    }
                 },
-                modifier = Modifier.width(100.dp),
+                enabled = !isAdded, // desactiva para evitar doble click
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .width(100.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isAdded) MaterialTheme.colorScheme.tertiary
                     else MaterialTheme.colorScheme.primary
                 )
             ) {
                 if (isAdded) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Agregado",
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Icon(Icons.Default.Check, contentDescription = "Agregado", modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("✓")
                 } else {
