@@ -1,18 +1,19 @@
 package com.pdmtaller2.t00363823_SamuelAnzora.ui.screens
 
-import RestaurantItem
 import RestaurantRow
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pdmtaller2.t00363823_SamuelAnzora.R
+import com.pdmtaller2.t00363823_SamuelAnzora.data.allRestaurants
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.components.BottomNavBar
 
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+    val restaurantsByCategory = allRestaurants.groupBy { it.category }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -24,30 +25,17 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        Text(text = "Comida Rápida", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-        RestaurantRow(
-            listOf(
-                RestaurantItem("McDonalds", R.drawable.mcdonal),
-                RestaurantItem("Burger King", R.drawable.burger),
-                RestaurantItem("KFC", R.drawable.kfc)
+        restaurantsByCategory.forEach { (category, restaurants) ->
+            Text(
+                text = category,
+                style = MaterialTheme.typography.titleMedium
             )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = "Comida Mexicana", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-        RestaurantRow(
-            listOf(
-                RestaurantItem("Taco Bell", R.drawable.tacobell),
-                RestaurantItem("Chipotle", R.drawable.chipotle),
-                RestaurantItem("El Pollo Loco", R.drawable.pollo_loco)
-            )
-        )
+            Spacer(modifier = Modifier.height(8.dp))
+            RestaurantRow(restaurants)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         Spacer(modifier = Modifier.weight(1f))
-
         BottomNavBar(selected = "Listado")
     }
 }

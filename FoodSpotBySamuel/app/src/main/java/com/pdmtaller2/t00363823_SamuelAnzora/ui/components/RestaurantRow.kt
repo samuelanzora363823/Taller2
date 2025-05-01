@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.pdmtaller2.t00363823_SamuelAnzora.model.RestaurantItem
 
 @Composable
 fun RestaurantRow(restaurants: List<RestaurantItem>) {
