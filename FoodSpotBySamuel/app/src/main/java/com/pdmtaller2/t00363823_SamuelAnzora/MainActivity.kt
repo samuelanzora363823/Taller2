@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pdmtaller2.t00363823_SamuelAnzora.navigation.AppNavGraph
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.components.BottomNavBar
@@ -26,59 +27,71 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FoodSpotBySamuelTheme {
-                val navController = rememberNavController()
-                var selectedItem by remember { mutableStateOf("Listado") }
-                var showBottomBar by remember { mutableStateOf(true) }
-
-                // Observar cambios en la navegación para mostrar/ocultar el BottomBar
-                LaunchedEffect(navController) {
-                    navController.currentBackStackEntryFlow.collect { backStackEntry ->
-                        // Determinar si mostrar u ocultar el BottomBar basado en la ruta actual
-                        showBottomBar = when (backStackEntry.destination.route) {
-                            "listado" -> true
-                            "busqueda" -> true
-                            "mis ordenes" -> true
-                            else -> false // Oculta el BottomBar en otras pantallas
-                        }
-                    }
-                }
-
-                Scaffold(
-                    bottomBar = {
-                        if (showBottomBar) {
-                            BottomNavBar(
-                                selected = selectedItem,
-                                onNavigate = { route ->
-                                    selectedItem = when (route) {
-                                        "listado" -> "Listado"
-                                        "busqueda" -> "Busqueda"
-                                        "mis ordenes" -> "Mis ordenes"
-                                        else -> selectedItem
-                                    }
-                                    navController.navigate(route) {
-                                        popUpTo(navController.graph.startDestinationId)
-                                        launchSingleTop = true
-                                    }
-                                }
-                            )
-                        }
-                    }
-                ) { innerPadding ->
-                    AppNavGraph(
-                        navController = navController,
-                        onSelectedItemChange = { selectedItem = it },
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                FoodSpotApp()
             }
         }
     }
 }
+
+@Composable
+fun FoodSpotApp() {
+    val navController = rememberNavController()
+    var selectedItem by remember { mutableStateOf("Listado") }
+    var showBottomBar by remember { mutableStateOf(true) }
+
+    // Observar cambios en la navegación
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    LaunchedEffect(navBackStackEntry) {
+        // Determinar visibilidad del BottomBar y ítem seleccionado
+        when (navBackStackEntry?.destination?.route) {
+            "listado" -> {
+                selectedItem = "Listado"
+                showBottomBar = true
+            }
+            "busqueda" -> {
+                selectedItem = "Busqueda"
+                showBottomBar = true
+            }
+            "mis ordenes" -> {
+                selectedItem = "Mis ordenes"
+                showBottomBar = true
+            }
+            else -> showBottomBar = false
+        }
+    }
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                BottomNavBar(
+                    selected = selectedItem,
+                    onNavigate = { route ->
+                        navController.navigate(route) {
+                            // Configuración para evitar múltiples instancias
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+        }
+    ) { innerPadding ->
+        AppNavGraph(
+            navController = navController,
+            onSelectedItemChange = { selectedItem = it },
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     FoodSpotBySamuelTheme {
-        val navController = rememberNavController()
-        AppNavGraph(navController = navController, onSelectedItemChange = {})
+        FoodSpotApp()
     }
 }
