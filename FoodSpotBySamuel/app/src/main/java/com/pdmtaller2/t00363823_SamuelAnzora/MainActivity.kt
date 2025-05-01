@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pdmtaller2.t00363823_SamuelAnzora.navigation.AppNavGraph
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.components.BottomNavBar
+import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.CartManager
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.theme.FoodSpotBySamuelTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,12 +40,12 @@ fun FoodSpotApp() {
     val navController = rememberNavController()
     var selectedItem by remember { mutableStateOf("Listado") }
     var showBottomBar by remember { mutableStateOf(true) }
+    val cartItemCount by remember { derivedStateOf { CartManager.getTotalItems() } }
 
     // Observar cambios en la navegación
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     LaunchedEffect(navBackStackEntry) {
-        // Determinar visibilidad del BottomBar y ítem seleccionado
         when (navBackStackEntry?.destination?.route) {
             "listado" -> {
                 selectedItem = "Listado"
@@ -53,8 +55,8 @@ fun FoodSpotApp() {
                 selectedItem = "Busqueda"
                 showBottomBar = true
             }
-            "mis ordenes" -> {
-                selectedItem = "Mis ordenes"
+            "carrito" -> {
+                selectedItem = "Carrito"
                 showBottomBar = true
             }
             else -> showBottomBar = false
@@ -68,7 +70,6 @@ fun FoodSpotApp() {
                     selected = selectedItem,
                     onNavigate = { route ->
                         navController.navigate(route) {
-                            // Configuración para evitar múltiples instancias
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
@@ -87,7 +88,6 @@ fun FoodSpotApp() {
         )
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {

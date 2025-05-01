@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.CartScreen
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.HomeScreen
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.RestaurantMenuScreen
 import com.pdmtaller2.t00363823_SamuelAnzora.ui.screens.SearchScreen
@@ -29,7 +30,7 @@ fun AppNavGraph(
                 onNavigate = { route ->
                     when (route) {
                         "busqueda" -> onSelectedItemChange("Busqueda")
-                        "mis ordenes" -> onSelectedItemChange("Mis ordenes")
+                        "carrito" -> onSelectedItemChange("Carrito")
                     }
                     navController.navigate(route)
                 }
@@ -44,6 +45,11 @@ fun AppNavGraph(
         composable("busqueda") {
             onSelectedItemChange("Busqueda")
             SearchScreen(navController = navController)
+        }
+
+        composable("carrito") {
+            onSelectedItemChange("Carrito")
+            CartScreen(navController = navController)
         }
     }
 }
