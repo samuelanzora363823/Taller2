@@ -31,27 +31,23 @@ import com.pdmtaller2.t00363823_SamuelAnzora.data.getMenuForRestaurant
 import com.pdmtaller2.t00363823_SamuelAnzora.model.DishItem
 import com.pdmtaller2.t00363823_SamuelAnzora.model.RestaurantItem
 
-
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController) {
     val context = LocalContext.current
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Normalizamos la cadena de búsqueda eliminando todos los espacios y convirtiéndolo a minúsculas
+    // Se normaliza la búsqueda: se eliminan espacios y se pasa a minúsculas para mejorar coincidencias
     val normalizedSearchQuery = searchQuery.text.replace(Regex("\\s+"), "").lowercase()
 
-    // Aquí creamos una lista con todos los platos de todos los restaurantes
+    // Se combinan todos los platillos de todos los restaurantes para búsqueda unificada
     val allDishes = allRestaurants.flatMap { restaurant ->
         getMenuForRestaurant(restaurant.name).map { dish ->
             Pair(restaurant, dish)
         }
     }
 
-    // Filtramos los restaurantes y platos con la normalización aplicada
+    // Se filtran restaurantes y platillos con la búsqueda ya normalizada
     val filteredRestaurants = allRestaurants.filter {
         it.name.replace(Regex("\\s+"), "").lowercase().contains(normalizedSearchQuery) ||
                 it.category.replace(Regex("\\s+"), "").lowercase().contains(normalizedSearchQuery)
@@ -79,6 +75,7 @@ fun SearchScreen(navController: NavController) {
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
+            // Campo de texto para ingresar la búsqueda
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -94,6 +91,7 @@ fun SearchScreen(navController: NavController) {
             )
 
             if (searchQuery.text.isNotEmpty()) {
+                // Mostrar resultados de restaurantes
                 if (filteredRestaurants.isNotEmpty()) {
                     Text(
                         text = "Restaurantes",
@@ -101,15 +99,14 @@ fun SearchScreen(navController: NavController) {
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(filteredRestaurants) { restaurant ->
                             RestaurantSearchItem(restaurant, navController)
                         }
                     }
                 }
 
+                // Mostrar resultados de platillos
                 if (filteredDishes.isNotEmpty()) {
                     Text(
                         text = "Platillos",
@@ -117,15 +114,14 @@ fun SearchScreen(navController: NavController) {
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(filteredDishes) { (restaurant, dish) ->
                             DishSearchItem(dish, restaurant, navController)
                         }
                     }
                 }
 
+                // Si no hay resultados
                 if (filteredRestaurants.isEmpty() && filteredDishes.isEmpty()) {
                     Box(
                         modifier = Modifier
@@ -137,6 +133,7 @@ fun SearchScreen(navController: NavController) {
                     }
                 }
             } else {
+                // Mensaje cuando no hay nada ingresado aún
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -150,6 +147,7 @@ fun SearchScreen(navController: NavController) {
     }
 }
 
+// Componente que muestra un restaurante en la búsqueda
 @Composable
 fun RestaurantSearchItem(restaurant: RestaurantItem, navController: NavController) {
     Card(
@@ -170,19 +168,14 @@ fun RestaurantSearchItem(restaurant: RestaurantItem, navController: NavControlle
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(
-                    text = restaurant.name,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = restaurant.category,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Text(text = restaurant.name, style = MaterialTheme.typography.titleMedium)
+                Text(text = restaurant.category, style = MaterialTheme.typography.bodySmall)
             }
         }
     }
 }
 
+// Componente que muestra un platillo en la búsqueda
 @Composable
 fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: NavController) {
     var isAdded by remember { mutableStateOf(false) }
@@ -196,7 +189,7 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
         Row(
             modifier = Modifier
                 .padding(16.dp)
-                .clickable { /* Opcional: navegación a detalles */ },
+                .clickable { /* Podrías navegar a detalles del platillo si lo deseas */ },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -211,10 +204,7 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = dish.name,
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Text(text = dish.name, style = MaterialTheme.typography.titleMedium)
                 Text(
                     text = restaurant.name,
                     style = MaterialTheme.typography.bodySmall,
@@ -238,6 +228,7 @@ fun DishSearchItem(dish: DishItem, restaurant: RestaurantItem, navController: Na
                 }
             }
 
+            // Botón para agregar al carrito (se desactiva luego de agregar)
             Button(
                 onClick = {
                     CartManager.addToCart(dish)

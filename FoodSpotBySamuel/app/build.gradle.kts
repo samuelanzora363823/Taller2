@@ -68,6 +68,7 @@ dependencies {
 
     // 🔥 FUNDAMENTAL: Para LazyRow, Column, Scroll, etc.
     implementation("androidx.compose.foundation:foundation")
+    implementation(libs.androidx.material.icons.core.android)
 
     // Pruebas
     testImplementation(libs.junit)

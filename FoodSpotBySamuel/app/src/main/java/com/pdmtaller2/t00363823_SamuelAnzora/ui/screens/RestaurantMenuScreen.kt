@@ -28,10 +28,11 @@ import com.pdmtaller2.t00363823_SamuelAnzora.model.DishItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
-    var search by remember { mutableStateOf(TextFieldValue("")) }
-    val dishes = getMenuForRestaurant(restaurantName)
+    var search by remember { mutableStateOf(TextFieldValue("")) } // Estado del campo de búsqueda
+
+    val dishes = getMenuForRestaurant(restaurantName) // Obtiene los platos del restaurante
     val filtered = dishes.filter {
-        it.name.contains(search.text, ignoreCase = true)
+        it.name.contains(search.text, ignoreCase = true) // Filtrado dinámico según búsqueda
     }
 
     Scaffold(
@@ -44,6 +45,7 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
                     }
                 },
                 actions = {
+                    // Ícono del carrito con badge que muestra el total de ítems
                     IconButton(onClick = { navController.navigate("carrito") }) {
                         BadgedBox(
                             badge = {
@@ -83,7 +85,7 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filtered) { dish ->
-                    DishCard(dish = dish)
+                    DishCard(dish = dish) // Cada platillo se muestra en su propia tarjeta
                 }
             }
         }
@@ -92,7 +94,7 @@ fun RestaurantMenuScreen(navController: NavController, restaurantName: String) {
 
 @Composable
 fun DishCard(dish: DishItem) {
-    var isAdded by remember { mutableStateOf(false) }
+    var isAdded by remember { mutableStateOf(false) } // Estado local para controlar si ya se añadió al carrito
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -141,11 +143,11 @@ fun DishCard(dish: DishItem) {
             Button(
                 onClick = {
                     if (!isAdded) {
-                        isAdded = true // cambia el estado inmediatamente
-                        CartManager.addToCart(dish)
+                        isAdded = true // Evita múltiples clics
+                        CartManager.addToCart(dish) // Agrega al carrito
                     }
                 },
-                enabled = !isAdded, // desactiva para evitar doble click
+                enabled = !isAdded, // Se desactiva después de agregar
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .width(100.dp),
